@@ -1,0 +1,28 @@
+{
+  "name": "js.conf.d-webpack",
+  "version": "1.0.0",
+  "description": "A simple config loader with folder overrides - Webpack edition",
+  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mancontr/js.conf.d-webpack.git"
+  },
+  "keywords": [
+    "webpack",
+    "config",
+    "loader",
+    "overrides"
+  ],
+  "author": "Anxo Soto",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/mancontr/js.conf.d-webpack/issues"
+  },
+  "homepage": "https://github.com/mancontr/js.conf.d-webpack#readme",
+  "files": [
+    "src/index.js"
+  ],
+  "dependencies": {
+    "js.conf.d": "^1.2.0"
+  }
+}
