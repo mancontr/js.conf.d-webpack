@@ -32,7 +32,6 @@ class JsconfdPlugin {
     contents += 'const merge = ' + (this.opts.merge ? this.opts.merge.toString() : 'Object.assign') + '\n'
     contents += 'const ret = files.reduce((acc, curr) => merge(acc, curr), {})\n'
     contents += 'export default ret\n'
-    console.log(contents)
 
     compiler.inputFileSystem._statStorage.data.set(modulePath, [null, stats]);
     compiler.inputFileSystem._readFileStorage.data.set(modulePath, [null, contents]);
