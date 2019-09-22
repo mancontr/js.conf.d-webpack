@@ -1,6 +1,6 @@
 {
   "name": "js.conf.d-webpack",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "A simple config loader with folder overrides - Webpack edition",
   "main": "src/index.js",
   "repository": {

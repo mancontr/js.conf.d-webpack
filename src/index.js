@@ -33,8 +33,17 @@ class JsconfdPlugin {
     contents += 'const ret = files.reduce((acc, curr) => merge(acc, curr), {})\n'
     contents += 'export default ret\n'
 
-    compiler.inputFileSystem._statStorage.data.set(modulePath, [null, stats]);
-    compiler.inputFileSystem._readFileStorage.data.set(modulePath, [null, contents]);
+    const addToFs = () => {
+      compiler.inputFileSystem._statStorage.data.set(modulePath, [null, stats]);
+      compiler.inputFileSystem._readFileStorage.data.set(modulePath, [null, contents]);
+    }
+    addToFs()
+
+    const origPurge = compiler.inputFileSystem.purge
+    compiler.inputFileSystem.purge = () => {
+      origPurge.apply(compiler.inputFileSystem, arguments)
+      addToFs()
+    }
   }
 
   resolve(resolver, request, resolveContext, callback) {
