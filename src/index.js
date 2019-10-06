@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const VirtualModulesPlugin = require('webpack-virtual-modules');
 
 const { getEnabledFiles } = require('js.conf.d')
 
@@ -7,21 +8,26 @@ class JsconfdPlugin {
 
   constructor(opts) {
     this.opts = opts
+    this.vmp = new VirtualModulesPlugin()
   }
 
   apply(compiler) {
-    this.addVirtualIndex(compiler, getEnabledFiles(this.opts.folders, this.opts.sort))
+    this.vmp.apply(compiler)
+
+    compiler.hooks.afterResolvers.tap('jsconfd', () => {
+      this.addVirtualIndex(compiler, getEnabledFiles(this.opts.folders, this.opts.sort))
+    });
 
     compiler.resolverFactory.hooks.resolver
       .for('normal')
       .tap('jsconfd', resolver => {
-        resolver.hooks.resolve.tapAsync('jsconfd', this.resolve.bind(this, resolver))
+        resolver.hooks.resolve.tapAsync('jsconfd', this.resolve.bind(this, compiler, resolver))
       });
   }
 
   addVirtualIndex(compiler, files) {
-    const modulePath = path.resolve(__dirname, '__virtual-conf.js')
-    const stats = { isFile: () => true }
+    const name = compiler.options.name || 'default'
+    const modulePath = path.resolve(__dirname, '__virtual-conf-' + name + '.js')
 
     let contents = ''
     contents += 'const files = [\n'
@@ -33,26 +39,17 @@ class JsconfdPlugin {
     contents += 'const ret = files.reduce((acc, curr) => merge(acc, curr), {})\n'
     contents += 'export default ret\n'
 
-    const addToFs = () => {
-      compiler.inputFileSystem._statStorage.data.set(modulePath, [null, stats]);
-      compiler.inputFileSystem._readFileStorage.data.set(modulePath, [null, contents]);
-    }
-    addToFs()
-
-    const origPurge = compiler.inputFileSystem.purge
-    compiler.inputFileSystem.purge = () => {
-      origPurge.apply(compiler.inputFileSystem, arguments)
-      addToFs()
-    }
+    this.vmp.writeModule(modulePath, contents)
   }
 
-  resolve(resolver, request, resolveContext, callback) {
+  resolve(compiler, resolver, request, resolveContext, callback) {
     if (request.request === '#js.conf.d') {
       // Resolve to our previously-added virtual file
+      const name = compiler.options.name || 'default'
       const obj = {
         context: request.context,
         path: __dirname,
-        request: './__virtual-conf.js'
+        request: './__virtual-conf-' + name + '.js'
       }
       return resolver.doResolve(resolver.hooks.resolve, obj, '', resolveContext, callback)
     }
