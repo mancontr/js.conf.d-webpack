@@ -1,6 +1,5 @@
-const fs = require('fs')
 const path = require('path')
-const VirtualModulesPlugin = require('webpack-virtual-modules');
+const VirtualModulesPlugin = require('webpack-virtual-modules')
 
 const { getEnabledFiles } = require('js.conf.d')
 
@@ -16,13 +15,13 @@ class JsconfdPlugin {
 
     compiler.hooks.afterResolvers.tap('jsconfd', () => {
       this.addVirtualIndex(compiler, getEnabledFiles(this.opts.folders, this.opts.sort))
-    });
+    })
 
     compiler.resolverFactory.hooks.resolver
       .for('normal')
       .tap('jsconfd', resolver => {
         resolver.hooks.resolve.tapAsync('jsconfd', this.resolve.bind(this, compiler, resolver))
-      });
+      })
   }
 
   addVirtualIndex(compiler, files) {
