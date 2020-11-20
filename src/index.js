@@ -31,7 +31,7 @@ class JsconfdPlugin {
     let contents = ''
     contents += 'const files = [\n'
     for (const file of files) {
-      contents += `require('${file}'),\n`
+      contents += `require('${file.replace(/\\/g, '\\\\')}'),\n`
     }
     contents += ']\n'
     contents += 'const merge = ' + (this.opts.merge ? this.opts.merge.toString() : 'Object.assign') + '\n'
